@@ -1,5 +1,7 @@
 #!/bin/bash
 #docker install
+#Ollama and ROCm v0.1.2.9 Dockers
+#https://hub.docker.com/r/ollama/ollama/tags?page=1
 set -e
 sudo apt update
 sudo apt install ca-certificates curl gnupg -y
@@ -16,19 +18,33 @@ sudo apt update
 sudo apt install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
 sudo usermod -aG docker $USER
 newgrp docker
-echo Done docker
+echo "Done Docker"
 echo ""
-echo "try docker version"
+echo "try command docker version"
 echo "sudo systemctl status docker"
 echo "docker run hello-world"
 
+#Install Ollama Docker and then ROCm v0.1.29
+
+time sudo docker pull ollama/ollama:latest
+time sudo docker pull ollama/ollama:0.1.29-rocm
+time sudo docker run -d -v ollama:/root/.ollama -p 11434:11434 --name ollama -e HSA_OVERRIDE_GFX_VERSION='10.3.0' --group-add=video --ipc=host --privileged --cap-add=SYS_PTRACE --security-opt seccomp=unconfined ollama/ollama:0.1.29-rocm
+echo ""
+echo "Install done give it a test with this small model or tinyllama"
+echo "time sudo docker exec -it ollama ollama run tinydolphin --verbose"
+echo ""
+echo "AFTER REBOOT must run this "
+echo " sudo docker rename ollama ollama1" 
+echo " and rerun pull for ollama/ollama:latest and ollama/ollama:0.1.29-rocm"
+echo " then run the AMD GPU specific docker run command"
+echo " time sudo docker run -d -v ollama:/root/.ollama -p 11434:11434 --name ollama -e HSA_OVERRIDE_GFX_VERSION='10.3.0' --group-add=video --ipc=host --privileged --cap-add=SYS_PTRACE --security-opt seccomp=unconfined ollama/ollama:0.1.29-rocm"
 #time sudo docker pull ollama/ollama:latest
 #echo "Latest docker ollama installed"
-#time sudo docker pull ollama/ollama:0.1.27-rocm
+#time sudo docker pull ollama/ollama:0.1.29-rocm
 #echo "Version 0.1.27 ROCm docker installed"
 #echo "Running AMDGPU ready ollama docker"
-#time sudo docker run -d -v ollama:/root/.ollama -p 11434:11434 --name ollama -e HSA_OVERRIDE_GFX_VERSION='10.3.0' --group-add=video --ipc=host --privileged --cap-add=SYS_PTRACE --security-opt seccomp=unconfined ollama/ollama:0.1.27-rocm
-#echo "docker exec -it ollama ollama run MODEL_HERE"
+#time sudo docker run -d -v ollama:/root/.ollama -p 11434:11434 --name ollama -e HSA_OVERRIDE_GFX_VERSION='10.3.0' --group-add=video --ipc=host --privileged --cap-add=SYS_PTRACE --security-opt seccomp=unconfined ollama/ollama:0.1.29-rocm
+#echo "docker exec -it ollama ollama run MODEL_HERE --verbose"
 #sudo docker exec -it ollama ollama run tinyllama --verbose
 echo "Done Dockering"
 #EOF
